@@ -272,17 +272,19 @@ public class HPCPullMonitor extends PullMonitor {
             ZooKeeper zk = null;
             for (MonitorID completedJob : completedJobs) {
                 CommonUtils.removeMonitorFromQueue(queue, completedJob);
-                if (zk == null) {
-                    zk = completedJob.getJobExecutionContext().getZk();
+                if (ServerSettings.getEnableJobRestrictionValidation().equals("true")) { // is job restriction available?
+                    if (zk == null) {
+                        zk = completedJob.getJobExecutionContext().getZk();
+                    }
+                    String key = CommonUtils.getJobCountUpdatePath(completedJob);
+                    int i = 0;
+                    if (jobRemoveCountMap.containsKey(key)) {
+                        i = Integer.valueOf(jobRemoveCountMap.get(key));
+                    }
+                    jobRemoveCountMap.put(key, ++i);
                 }
-                String key = CommonUtils.getJobCountUpdatePath(completedJob);
-                int i = 0;
-                if (jobRemoveCountMap.containsKey(key)) {
-                    i = Integer.valueOf(jobRemoveCountMap.get(key));
-                }
-                jobRemoveCountMap.put(key, ++i);
             }
-            if (completedJobs.size() > 0) {
+            if (ServerSettings.getEnableJobRestrictionValidation().equals("true") && completedJobs.size() > 0) {
                 // reduce completed job count from zookeeper
                 CommonUtils.updateZkWithJobCount(zk, jobRemoveCountMap, false);
             }
