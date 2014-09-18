@@ -27,6 +27,7 @@ import org.apache.airavata.commons.gfac.type.ActualParameter;
 import org.apache.airavata.commons.gfac.type.HostDescription;
 import org.apache.airavata.commons.gfac.type.MappingFactory;
 import org.apache.airavata.credential.store.credential.impl.ssh.SSHCredential;
+import org.apache.airavata.gfac.Constants;
 import org.apache.airavata.gfac.GFacException;
 import org.apache.airavata.common.utils.RequestData;
 import org.apache.airavata.gfac.core.context.JobExecutionContext;
