@@ -27,9 +27,7 @@ package org.apache.airavata.gsi.ssh.impl.authentication;
  * Time: 12:15 PM
  */
 
-import org.apache.airavata.gsi.ssh.api.authentication.GSIAuthenticationInfo;
 import org.apache.airavata.gsi.ssh.api.authentication.SSHPasswordAuthentication;
-import org.ietf.jgss.*;
 
 /**
  * An authenticator used for raw SSH sessions. Gives SSH user name, password

@@ -332,7 +332,7 @@ service Airavata {
      * @return sucess/failure
      *
     **/
-  bool validateExperiment(1: required string airavataExperimentId)
+  bool validateExperiment(1: required string airavataExperimentId, 2: required string airavataCredStoreToken)
       throws (1: airavataErrors.InvalidRequestException ire,
               2: airavataErrors.ExperimentNotFoundException enf,
               3: airavataErrors.AiravataClientException ace,

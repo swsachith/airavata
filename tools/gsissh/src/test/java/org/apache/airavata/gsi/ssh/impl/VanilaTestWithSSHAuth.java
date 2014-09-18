@@ -21,10 +21,9 @@
 
 package org.apache.airavata.gsi.ssh.impl;
 
+import org.apache.airavata.credential.store.util.AuthenticationInfo;
 import org.apache.airavata.gsi.ssh.api.*;
-import org.apache.airavata.gsi.ssh.api.authentication.AuthenticationInfo;
 import org.apache.airavata.gsi.ssh.api.job.JobDescriptor;
-import org.apache.airavata.gsi.ssh.config.ConfigReader;
 import org.apache.airavata.gsi.ssh.impl.authentication.DefaultPasswordAuthenticationInfo;
 import org.apache.airavata.gsi.ssh.impl.authentication.DefaultPublicKeyFileAuthentication;
 import org.apache.airavata.gsi.ssh.util.CommonUtils;

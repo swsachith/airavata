@@ -45,7 +45,8 @@ public class SimpleAppDataValidator implements JobMetadataValidator {
         }
     }
 
-    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID) {
+    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID,
+                                    String credStoreToken) {
         boolean result = false;
         if (experiment.getUserConfigurationData().isAiravataAutoSchedule()) {
             logger.error("We dont' support auto scheduling at this point, We will simply use user data as it is");

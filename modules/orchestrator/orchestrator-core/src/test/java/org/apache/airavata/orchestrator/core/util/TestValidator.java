@@ -32,7 +32,8 @@ import org.slf4j.LoggerFactory;
 public class TestValidator implements JobMetadataValidator {
     private final static Logger logger = LoggerFactory.getLogger(TestValidator.class);
 
-    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID) {
+    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID,
+                                    String airavataCredStoreToken) {
         if (experiment.getProjectID() == null) {
             logger.error("Project ID is not set");
             ValidatorResult validatorResult = new ValidatorResult(false);

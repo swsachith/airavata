@@ -43,5 +43,6 @@ public interface JobMetadataValidator {
      * @param taskID
      * @return
      */
-    ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID);
+    ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID,
+                             String airavataCredStoreToken);
 }

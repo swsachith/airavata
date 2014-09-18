@@ -22,15 +22,13 @@ package org.apache.airavata.gfac.monitor;/*
 import org.apache.airavata.commons.gfac.type.HostDescription;
 import org.apache.airavata.gfac.core.context.JobExecutionContext;
 import org.apache.airavata.gfac.core.monitor.MonitorID;
-import org.apache.airavata.gsi.ssh.api.authentication.AuthenticationInfo;
+import org.apache.airavata.credential.store.util.AuthenticationInfo;
 import org.apache.airavata.gsi.ssh.impl.authentication.MyProxyAuthenticationInfo;
-import org.apache.airavata.model.workspace.experiment.JobState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Map;
 
 public class HPCMonitorID extends MonitorID {
     private final static Logger logger = LoggerFactory.getLogger(HPCMonitorID.class);

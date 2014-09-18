@@ -915,7 +915,7 @@ public class AiravataServerHandler implements Airavata.Iface, Watcher {
      * @param airavataExperimentId
      */
     @Override
-    public boolean validateExperiment(String airavataExperimentId) throws InvalidRequestException, ExperimentNotFoundException, AiravataClientException, AiravataSystemException, TException {
+    public boolean validateExperiment(String airavataExperimentId, String airavataCredStoreToken) throws InvalidRequestException, ExperimentNotFoundException, AiravataClientException, AiravataSystemException, TException {
      	try {
             registry = RegistryFactory.getDefaultRegistry();
  			if (!registry.isExist(RegistryModelType.EXPERIMENT, airavataExperimentId)){
@@ -929,7 +929,7 @@ public class AiravataServerHandler implements Airavata.Iface, Watcher {
  	            throw exception;
  		}
 
-        if (getOrchestratorClient().validateExperiment(airavataExperimentId)) {
+        if (getOrchestratorClient().validateExperiment(airavataExperimentId, airavataCredStoreToken)) {
             return true;
         } else {
             return false;
@@ -1164,7 +1164,7 @@ public class AiravataServerHandler implements Airavata.Iface, Watcher {
 			if (executionType==ExecutionType.SINGLE_APP){
 				//its an single application execution experiment
 		    	final OrchestratorService.Client orchestratorClient = getOrchestratorClient();
-				if (orchestratorClient.validateExperiment(expID)) {
+				if (orchestratorClient.validateExperiment(expID,airavataCredStoreToken)) {
 					thread = new Thread() {
 	                    public void run() {
 	                        try {

@@ -27,7 +27,7 @@ import org.apache.airavata.common.utils.DatabaseTestCases;
 import org.apache.airavata.common.utils.DerbyUtil;
 import org.apache.airavata.credential.store.store.CredentialReader;
 import org.apache.airavata.credential.store.store.impl.CredentialReaderImpl;
-import org.apache.airavata.gfac.RequestData;
+import org.apache.airavata.common.utils.RequestData;
 import org.apache.airavata.gfac.gram.security.GSISecurityContext;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;

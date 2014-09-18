@@ -25,7 +25,7 @@ import com.jcraft.jsch.ExtendedSession;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import org.apache.airavata.gsi.ssh.api.authentication.GSIAuthenticationInfo;
+import org.apache.airavata.credential.store.util.GSIAuthenticationInfo;
 
 /**
  * User: AmilaJ (amilaj@apache.org)

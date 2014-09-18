@@ -25,9 +25,10 @@ import org.apache.airavata.common.utils.ServerSettings;
 import org.apache.airavata.credential.store.credential.Credential;
 import org.apache.airavata.credential.store.credential.impl.ssh.SSHCredential;
 import org.apache.airavata.credential.store.store.CredentialReader;
+import org.apache.airavata.credential.store.util.Utility;
 import org.apache.airavata.gfac.Constants;
 import org.apache.airavata.gfac.GFacException;
-import org.apache.airavata.gfac.RequestData;
+import org.apache.airavata.common.utils.RequestData;
 import org.apache.airavata.gfac.core.utils.GFacUtils;
 import org.apache.airavata.gsi.ssh.api.authentication.SSHPublicKeyFileAuthentication;
 import org.slf4j.Logger;
@@ -114,7 +115,7 @@ public class TokenizedSSHAuthInfo implements SSHPublicKeyFileAuthentication {
     public SSHCredential getCredentialsFromStore() throws Exception {
 
         if (getCredentialReader() == null) {
-            credentialReader = GFacUtils.getCredentialReader();
+            credentialReader = Utility.getCredentialReader();
         }
 
         Credential credential = getCredentialReader().getCredential(getRequestData().getGatewayId(),

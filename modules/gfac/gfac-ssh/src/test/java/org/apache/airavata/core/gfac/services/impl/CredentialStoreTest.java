@@ -33,7 +33,7 @@
 //import org.apache.airavata.credential.store.store.CredentialReader;
 //import org.apache.airavata.credential.store.store.impl.CredentialReaderImpl;
 //import org.apache.airavata.gfac.GFacException;
-//import org.apache.airavata.gfac.RequestData;
+//import org.apache.airavata.common.utils.RequestData;
 //import org.apache.airavata.gfac.ssh.security.TokenizedSSHAuthInfo;
 //import org.apache.airavata.gsi.ssh.api.SSHApiException;
 //import org.apache.airavata.gsi.ssh.api.ServerInfo;

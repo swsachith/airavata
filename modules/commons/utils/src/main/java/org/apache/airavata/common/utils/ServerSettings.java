@@ -71,6 +71,8 @@ public class ServerSettings extends ApplicationSettings {
     private static final String MY_PROXY_LIFETIME = "myproxy.life";
     private static final String ACTIVITY_LISTENERS = "activity.listeners";
 
+    private static final String GLOBAL_MAX_JOB_COUNT = "global.max.job.count";
+
     private static boolean stopAllThreads = false;
 
     public static String getDefaultUser() throws ApplicationSettingsException {
@@ -99,6 +101,10 @@ public class ServerSettings extends ApplicationSettings {
 
     public static String getServerContextRoot() {
         return getSetting(SERVER_CONTEXT_ROOT, "axis2");
+    }
+
+    public static String getGlobalMaxJobCount() throws ApplicationSettingsException {
+        return getSetting(GLOBAL_MAX_JOB_COUNT);
     }
 
     public static String getCredentialStoreDBUser() throws ApplicationSettingsException {

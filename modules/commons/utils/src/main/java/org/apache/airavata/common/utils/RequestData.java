@@ -19,7 +19,7 @@
  *
  */
 
-package org.apache.airavata.gfac;
+package org.apache.airavata.common.utils;
 
 /**
  * User: AmilaJ (amilaj@apache.org)

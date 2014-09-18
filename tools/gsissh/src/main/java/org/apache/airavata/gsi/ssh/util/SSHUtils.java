@@ -22,7 +22,7 @@ package org.apache.airavata.gsi.ssh.util;
 
 import com.jcraft.jsch.*;
 
-import org.apache.airavata.gsi.ssh.api.authentication.GSIAuthenticationInfo;
+import org.apache.airavata.credential.store.util.GSIAuthenticationInfo;
 import org.apache.airavata.gsi.ssh.api.SSHApiException;
 import org.apache.airavata.gsi.ssh.api.ServerInfo;
 import org.apache.airavata.gsi.ssh.config.ConfigReader;

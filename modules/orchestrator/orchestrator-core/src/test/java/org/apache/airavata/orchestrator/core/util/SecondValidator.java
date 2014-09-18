@@ -28,7 +28,8 @@ import org.apache.airavata.orchestrator.core.exception.OrchestratorException;
 import org.apache.airavata.orchestrator.core.validator.JobMetadataValidator;
 
 public class SecondValidator implements JobMetadataValidator {
-    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID) {
+    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID,
+                                    String airavataCredStoreToken) {
         if(taskID.getTaskID() == null) {
             ValidatorResult validatorResult = new ValidatorResult(false);
             validatorResult.setErrorDetails("No taskID is set, so Validation failed");

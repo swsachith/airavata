@@ -21,7 +21,8 @@
 
 package com.jcraft.jsch;
 
-import org.apache.airavata.gsi.ssh.api.authentication.GSIAuthenticationInfo;
+
+import org.apache.airavata.credential.store.util.GSIAuthenticationInfo;
 
 public class ExtendedSession extends Session {
 

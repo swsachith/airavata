@@ -21,6 +21,12 @@
 
 package org.apache.airavata.credential.store.util;
 
+import org.apache.airavata.common.exception.ApplicationSettingsException;
+import org.apache.airavata.common.utils.DBUtil;
+import org.apache.airavata.common.utils.ServerSettings;
+import org.apache.airavata.credential.store.store.CredentialReader;
+import org.apache.airavata.credential.store.store.impl.CredentialReaderImpl;
+
 import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -75,4 +81,15 @@ public class Utility {
         return new char[0];
     }
 
+
+    public static CredentialReader getCredentialReader()
+            throws ApplicationSettingsException, IllegalAccessException,
+            ClassNotFoundException, InstantiationException {
+        String jdbcUrl = ServerSettings.getCredentialStoreDBURL();
+        String jdbcUsr = ServerSettings.getCredentialStoreDBUser();
+        String jdbcPass = ServerSettings.getCredentialStoreDBPassword();
+        String driver = ServerSettings.getCredentialStoreDBDriver();
+        return new CredentialReaderImpl(new DBUtil(jdbcUrl, jdbcUsr, jdbcPass,
+                driver));
+    }
 }

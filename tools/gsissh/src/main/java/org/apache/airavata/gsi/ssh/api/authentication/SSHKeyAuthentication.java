@@ -25,6 +25,8 @@ package org.apache.airavata.gsi.ssh.api.authentication;/*
  * Time: 2:39 PM
  */
 
+import org.apache.airavata.credential.store.util.AuthenticationInfo;
+
 /**
  * Abstracts out common methods for SSH key authentication.
  */

@@ -231,7 +231,7 @@ public class OrchestratorServerHandler implements OrchestratorService.Iface,
 	 * @return
 	 * @throws TException
 	 */
-	public boolean validateExperiment(String experimentId) throws TException,
+	public boolean validateExperiment(String experimentId, String airavataCredStoreToken) throws TException,
 			LaunchValidationException {
 		// TODO: Write the Orchestrator implementaion
 		try {
@@ -261,7 +261,7 @@ public class OrchestratorServerHandler implements OrchestratorService.Iface,
 						return false;
 					}
 					return orchestrator.validateExperiment(experiment,
-							workflowNodeDetail, taskID).isSetValidationState();
+                            workflowNodeDetail, taskID, airavataCredStoreToken).isSetValidationState();
 				}
 			}
 

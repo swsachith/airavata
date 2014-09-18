@@ -21,7 +21,7 @@
 
 package org.apache.airavata.gsi.ssh.impl.authentication;
 
-import org.apache.airavata.gsi.ssh.api.authentication.GSIAuthenticationInfo;
+import org.apache.airavata.credential.store.util.GSIAuthenticationInfo;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.ietf.jgss.GSSCredential;

@@ -36,7 +36,7 @@ interface AiravataIf {
   public function updateExperiment($airavataExperimentId, \Airavata\Model\Workspace\Experiment\Experiment $experiment);
   public function updateExperimentConfiguration($airavataExperimentId, \Airavata\Model\Workspace\Experiment\UserConfigurationData $userConfiguration);
   public function updateResourceScheduleing($airavataExperimentId, \Airavata\Model\Workspace\Experiment\ComputationalResourceScheduling $resourceScheduling);
-  public function validateExperiment($airavataExperimentId);
+  public function validateExperiment($airavataExperimentId, $airavataCredStoreToken);
   public function launchExperiment($airavataExperimentId, $airavataCredStoreToken);
   public function getExperimentStatus($airavataExperimentId);
   public function getExperimentOutputs($airavataExperimentId);
@@ -1244,16 +1244,17 @@ class AiravataClient implements \Airavata\API\AiravataIf {
     return;
   }
 
-  public function validateExperiment($airavataExperimentId)
+  public function validateExperiment($airavataExperimentId, $airavataCredStoreToken)
   {
-    $this->send_validateExperiment($airavataExperimentId);
+    $this->send_validateExperiment($airavataExperimentId, $airavataCredStoreToken);
     return $this->recv_validateExperiment();
   }
 
-  public function send_validateExperiment($airavataExperimentId)
+  public function send_validateExperiment($airavataExperimentId, $airavataCredStoreToken)
   {
     $args = new \Airavata\API\Airavata_validateExperiment_args();
     $args->airavataExperimentId = $airavataExperimentId;
+    $args->airavataCredStoreToken = $airavataCredStoreToken;
     $bin_accel = ($this->output_ instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
     if ($bin_accel)
     {
@@ -9268,6 +9269,7 @@ class Airavata_validateExperiment_args {
   static $_TSPEC;
 
   public $airavataExperimentId = null;
+  public $airavataCredStoreToken = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -9276,11 +9278,18 @@ class Airavata_validateExperiment_args {
           'var' => 'airavataExperimentId',
           'type' => TType::STRING,
           ),
+        2 => array(
+          'var' => 'airavataCredStoreToken',
+          'type' => TType::STRING,
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['airavataExperimentId'])) {
         $this->airavataExperimentId = $vals['airavataExperimentId'];
+      }
+      if (isset($vals['airavataCredStoreToken'])) {
+        $this->airavataCredStoreToken = $vals['airavataCredStoreToken'];
       }
     }
   }
@@ -9311,6 +9320,13 @@ class Airavata_validateExperiment_args {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->airavataCredStoreToken);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -9327,6 +9343,11 @@ class Airavata_validateExperiment_args {
     if ($this->airavataExperimentId !== null) {
       $xfer += $output->writeFieldBegin('airavataExperimentId', TType::STRING, 1);
       $xfer += $output->writeString($this->airavataExperimentId);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->airavataCredStoreToken !== null) {
+      $xfer += $output->writeFieldBegin('airavataCredStoreToken', TType::STRING, 2);
+      $xfer += $output->writeString($this->airavataCredStoreToken);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();

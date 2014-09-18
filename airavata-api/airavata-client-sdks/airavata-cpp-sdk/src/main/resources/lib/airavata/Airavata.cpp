@@ -4716,6 +4716,7 @@ uint32_t Airavata_validateExperiment_args::read(::apache::thrift::protocol::TPro
   using ::apache::thrift::protocol::TProtocolException;
 
   bool isset_airavataExperimentId = false;
+  bool isset_airavataCredStoreToken = false;
 
   while (true)
   {
@@ -4733,6 +4734,14 @@ uint32_t Airavata_validateExperiment_args::read(::apache::thrift::protocol::TPro
           xfer += iprot->skip(ftype);
         }
         break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->airavataCredStoreToken);
+          isset_airavataCredStoreToken = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -4744,6 +4753,8 @@ uint32_t Airavata_validateExperiment_args::read(::apache::thrift::protocol::TPro
 
   if (!isset_airavataExperimentId)
     throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_airavataCredStoreToken)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
 
@@ -4753,6 +4764,10 @@ uint32_t Airavata_validateExperiment_args::write(::apache::thrift::protocol::TPr
 
   xfer += oprot->writeFieldBegin("airavataExperimentId", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString(this->airavataExperimentId);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("airavataCredStoreToken", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString(this->airavataCredStoreToken);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -4766,6 +4781,10 @@ uint32_t Airavata_validateExperiment_pargs::write(::apache::thrift::protocol::TP
 
   xfer += oprot->writeFieldBegin("airavataExperimentId", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString((*(this->airavataExperimentId)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("airavataCredStoreToken", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString((*(this->airavataCredStoreToken)));
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -20424,19 +20443,20 @@ void AiravataClient::recv_updateResourceScheduleing()
   return;
 }
 
-bool AiravataClient::validateExperiment(const std::string& airavataExperimentId)
+bool AiravataClient::validateExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken)
 {
-  send_validateExperiment(airavataExperimentId);
+  send_validateExperiment(airavataExperimentId, airavataCredStoreToken);
   return recv_validateExperiment();
 }
 
-void AiravataClient::send_validateExperiment(const std::string& airavataExperimentId)
+void AiravataClient::send_validateExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("validateExperiment", ::apache::thrift::protocol::T_CALL, cseqid);
 
   Airavata_validateExperiment_pargs args;
   args.airavataExperimentId = &airavataExperimentId;
+  args.airavataCredStoreToken = &airavataCredStoreToken;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -25659,7 +25679,7 @@ void AiravataProcessor::process_validateExperiment(int32_t seqid, ::apache::thri
 
   Airavata_validateExperiment_result result;
   try {
-    result.success = iface_->validateExperiment(args.airavataExperimentId);
+    result.success = iface_->validateExperiment(args.airavataExperimentId, args.airavataCredStoreToken);
     result.__isset.success = true;
   } catch ( ::apache::airavata::api::error::InvalidRequestException &ire) {
     result.ire = ire;

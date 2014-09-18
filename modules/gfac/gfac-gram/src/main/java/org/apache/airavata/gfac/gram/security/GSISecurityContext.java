@@ -28,7 +28,7 @@ import org.apache.airavata.credential.store.store.CredentialReader;
 import org.apache.airavata.gfac.AbstractSecurityContext;
 import org.apache.airavata.gfac.Constants;
 import org.apache.airavata.gfac.GFacException;
-import org.apache.airavata.gfac.RequestData;
+import org.apache.airavata.common.utils.RequestData;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.gsi.provider.GlobusProvider;
@@ -79,13 +79,13 @@ public class GSISecurityContext extends AbstractSecurityContext {
             log.info("Current directory " + f.getAbsolutePath());
             throw new RuntimeException("Cannot read trusted certificate path " + trustedCertificatePath);
         } else {
-            System.setProperty(Constants.TRUSTED_CERTIFICATE_SYSTEM_PROPERTY, file.getAbsolutePath());
+            System.setProperty(org.apache.airavata.common.utils.Constants.TRUSTED_CERTIFICATE_SYSTEM_PROPERTY, file.getAbsolutePath());
         }
     }
 
     private static void setUpTrustedCertificatePath() throws ApplicationSettingsException {
 
-        String trustedCertificatePath  = ServerSettings.getSetting(Constants.TRUSTED_CERT_LOCATION);
+        String trustedCertificatePath  = ServerSettings.getSetting(org.apache.airavata.common.utils.Constants.TRUSTED_CERT_LOCATION);
 
         setUpTrustedCertificatePath(trustedCertificatePath);
     }
@@ -96,7 +96,7 @@ public class GSISecurityContext extends AbstractSecurityContext {
      * @return The trusted certificate path as a string.
      */
     public static String getTrustedCertificatePath() {
-        return System.getProperty(Constants.TRUSTED_CERTIFICATE_SYSTEM_PROPERTY);
+        return System.getProperty(org.apache.airavata.common.utils.Constants.TRUSTED_CERTIFICATE_SYSTEM_PROPERTY);
     }
 
 

@@ -1,4 +1,4 @@
-package org.apache.airavata.gsi.ssh.api.authentication;/*
+package org.apache.airavata.credential.store.util;/*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

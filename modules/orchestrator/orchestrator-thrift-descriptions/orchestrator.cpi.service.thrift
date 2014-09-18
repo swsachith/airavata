@@ -64,7 +64,7 @@ service OrchestratorService {
      * @return sucess/failure
      *
     **/
-  bool validateExperiment(1: required string experimentId)
+  bool validateExperiment(1: required string experimentId, 2: required string airavataCredStoreToken)
   throws (1: airavataErrors.LaunchValidationException lve)
     /**
      *

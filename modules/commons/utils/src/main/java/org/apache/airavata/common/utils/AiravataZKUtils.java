@@ -21,9 +21,7 @@
 package org.apache.airavata.common.utils;
 
 import org.apache.airavata.common.exception.ApplicationSettingsException;
-import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.ServerCnxnFactory;

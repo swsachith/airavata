@@ -29,7 +29,8 @@ import org.slf4j.LoggerFactory;
 public class ExperimentStatusValidator implements JobMetadataValidator {
     private static Logger log = LoggerFactory.getLogger(ExperimentStatusValidator.class);
 
-    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID) {
+    public ValidatorResult validate(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID,
+                                    String credStoreToken) {
         String error = "During the validation step experiment status should be CREATED, But this experiment status is : ";
         ValidatorResult validatorResult = new ValidatorResult();
         if (!experiment.getExperimentStatus().getExperimentState().equals(ExperimentState.CREATED)) {

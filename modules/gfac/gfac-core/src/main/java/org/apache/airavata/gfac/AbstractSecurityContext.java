@@ -27,8 +27,8 @@ package org.apache.airavata.gfac;
  * Time: 4:33 PM
  */
 
+import org.apache.airavata.common.utils.RequestData;
 import org.apache.airavata.credential.store.store.CredentialReader;
-import org.apache.airavata.gfac.SecurityContext;
 
 /**
  * Abstract implementation of the security context.

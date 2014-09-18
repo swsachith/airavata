@@ -44,24 +44,50 @@ public class SimpleOrchestratorImpl extends AbstractOrchestrator{
     
     // this is going to be null unless the thread count is 0
     private JobSubmitter jobSubmitter = null;
-
+    private List<JobMetadataValidator> validatorList = new ArrayList<JobMetadataValidator>();
 
     public SimpleOrchestratorImpl() throws OrchestratorException {
-        try {
-            try {
-                String submitterClass = this.orchestratorContext.getOrchestratorConfiguration().getNewJobSubmitterClass();
-                Class<? extends JobSubmitter> aClass = Class.forName(submitterClass.trim()).asSubclass(JobSubmitter.class);
-                jobSubmitter = aClass.newInstance();
-                jobSubmitter.initialize(this.orchestratorContext);
+        init();
+    }
 
-            } catch (Exception e) {
-                String error = "Error creating JobSubmitter in non threaded mode ";
-                logger.error(error);
-                throw new OrchestratorException(error, e);
-            }
+    public void init() throws OrchestratorException {
+        try {
+            loadSubmitter();
+            loadValidators();
         } catch (OrchestratorException e) {
             logger.error("Error Constructing the Orchestrator");
             throw e;
+        }
+    }
+
+    private void loadValidators() throws OrchestratorException {
+        List<String> validatorClzzez = this.orchestratorContext.getOrchestratorConfiguration().getValidatorClasses();
+        Class<? extends JobMetadataValidator> vClass;
+        boolean allValidatorsFailed = true;
+        for (String validator : validatorClzzez) {
+            try {
+                vClass = Class.forName(validator.trim()).asSubclass(JobMetadataValidator.class);
+                validatorList.add(vClass.newInstance());
+                allValidatorsFailed = false;
+            } catch (Exception e) {
+                logger.warn("Error loading the validation class: " + validator, e);
+            }
+        }
+        if (allValidatorsFailed && validatorClzzez.size() > 0) {
+            throw new OrchestratorException("Error loading all JobMetadataValidator implementation classes");
+        }
+    }
+
+    private void loadSubmitter() throws OrchestratorException {
+        try {
+            String submitterClass = this.orchestratorContext.getOrchestratorConfiguration().getNewJobSubmitterClass();
+            Class<? extends JobSubmitter> aClass = Class.forName(submitterClass.trim()).asSubclass(JobSubmitter.class);
+            jobSubmitter = aClass.newInstance();
+            jobSubmitter.initialize(this.orchestratorContext);
+
+        } catch (Exception e) {
+            String error = "Error creating JobSubmitter in non threaded mode ";
+            throw new OrchestratorException(error, e);
         }
     }
 
@@ -107,44 +133,22 @@ public class SimpleOrchestratorImpl extends AbstractOrchestrator{
         return tasks;
     }
 
-    public ValidationResults validateExperiment(Experiment experiment, WorkflowNodeDetails workflowNodeDetail, TaskDetails taskID) throws OrchestratorException,LaunchValidationException {
+    public ValidationResults validateExperiment(Experiment experiment, WorkflowNodeDetails workflowNodeDetail,
+                                                TaskDetails taskID , String airavataCredStoreToken) throws OrchestratorException,LaunchValidationException {
         org.apache.airavata.model.error.ValidationResults validationResults = new org.apache.airavata.model.error.ValidationResults();
         validationResults.setValidationState(true); // initially making it to success, if atleast one failed them simply mark it failed.
         if (this.orchestratorConfiguration.isEnableValidation()) {
-            List<String> validatorClzzez = this.orchestratorContext.getOrchestratorConfiguration().getValidatorClasses();
             ValidatorResult vResult = null;
-            for (String validator : validatorClzzez) {
-                try {
-                    Class<? extends JobMetadataValidator> vClass = Class.forName(validator.trim()).asSubclass(JobMetadataValidator.class);
-                    JobMetadataValidator jobMetadataValidator = vClass.newInstance();
-                    vResult = jobMetadataValidator.validate(experiment, workflowNodeDetail, taskID);
+            for (JobMetadataValidator jobMetadataValidator : validatorList) {
+                    vResult = jobMetadataValidator.validate(experiment, workflowNodeDetail, taskID, airavataCredStoreToken);
                     if (vResult.isResult()) {
-                        logger.info("Validation of " + validator + " is SUCCESSFUL");
+                        logger.info("Validation of " + jobMetadataValidator.getClass().getName() + " is SUCCESSFUL");
                     } else {
-                        logger.error("Validation of " + validator + " is FAILED:[error]" + vResult.getErrorDetails());
+                        logger.error("Validation of " + jobMetadataValidator.getClass().getName() + " is FAILED:[error]" + vResult.getErrorDetails());
                         //todo we need to store this message to registry
                         validationResults.setValidationState(false);
                         // we do not return immediately after the first failure
                     }
-                } catch (ClassNotFoundException e) {
-                    logger.error("Error loading the validation class: ", validator, e);
-                    vResult = new ValidatorResult();
-                    vResult.setResult(false);
-                    vResult.setErrorDetails("Error loading the validation class: " + e.getMessage());
-                    validationResults.setValidationState(false);
-                } catch (InstantiationException e) {
-                    logger.error("Error loading the validation class: ", validator, e);
-                    vResult = new ValidatorResult();
-                    vResult.setResult(false);
-                    vResult.setErrorDetails("Error loading the validation class: " + e.getMessage());
-                    validationResults.setValidationState(false);
-                } catch (IllegalAccessException e) {
-                    logger.error("Error loading the validation class: ", validator, e);
-                    vResult = new ValidatorResult();
-                    vResult.setResult(false);
-                    vResult.setErrorDetails("Error loading the validation class: " + e.getMessage());
-                    validationResults.setValidationState(false);
-                }
                 validationResults.addToValidationResultList(vResult);
             }
         }

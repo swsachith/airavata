@@ -42,11 +42,12 @@ public interface Orchestrator {
      * @param experiment
      * @param workflowNodeDetail
      * @param taskID
+     * @param credStoreToken - airavata credential store token
      * @return boolean if the experiments are valids after executing all the validators return true otherwise it iwll return false
      * @throws OrchestratorException
      */
      ValidationResults validateExperiment(Experiment experiment, WorkflowNodeDetails workflowNodeDetail,
-                            TaskDetails taskID) throws OrchestratorException,LaunchValidationException;
+                            TaskDetails taskID, String credStoreToken) throws OrchestratorException,LaunchValidationException;
     /**
      * After creating the experiment Data user have the
      * experimentID as the handler to the experiment, during the launchExperiment

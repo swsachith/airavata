@@ -21,23 +21,14 @@
 
 package org.apache.airavata.gsi.ssh.impl;
 
-import junit.framework.Assert;
+import org.apache.airavata.credential.store.util.GSIAuthenticationInfo;
 import org.apache.airavata.gsi.ssh.api.*;
-import org.apache.airavata.gsi.ssh.api.authentication.GSIAuthenticationInfo;
-import org.apache.airavata.gsi.ssh.api.job.JobDescriptor;
 import org.apache.airavata.gsi.ssh.config.ConfigReader;
 import org.apache.airavata.gsi.ssh.impl.authentication.MyProxyAuthenticationInfo;
-import org.apache.airavata.gsi.ssh.util.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.AssertJUnit;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DefaultSSHApiTestWithMyProxyAuth {
     private static final Logger log = LoggerFactory.getLogger(PBSCluster.class);

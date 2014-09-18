@@ -51,7 +51,7 @@ class AiravataIf {
   virtual void updateExperiment(const std::string& airavataExperimentId, const  ::apache::airavata::model::workspace::experiment::Experiment& experiment) = 0;
   virtual void updateExperimentConfiguration(const std::string& airavataExperimentId, const  ::apache::airavata::model::workspace::experiment::UserConfigurationData& userConfiguration) = 0;
   virtual void updateResourceScheduleing(const std::string& airavataExperimentId, const  ::apache::airavata::model::workspace::experiment::ComputationalResourceScheduling& resourceScheduling) = 0;
-  virtual bool validateExperiment(const std::string& airavataExperimentId) = 0;
+  virtual bool validateExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken) = 0;
   virtual void launchExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken) = 0;
   virtual void getExperimentStatus( ::apache::airavata::model::workspace::experiment::ExperimentStatus& _return, const std::string& airavataExperimentId) = 0;
   virtual void getExperimentOutputs(std::vector< ::apache::airavata::model::workspace::experiment::DataObjectType> & _return, const std::string& airavataExperimentId) = 0;
@@ -196,7 +196,7 @@ class AiravataNull : virtual public AiravataIf {
   void updateResourceScheduleing(const std::string& /* airavataExperimentId */, const  ::apache::airavata::model::workspace::experiment::ComputationalResourceScheduling& /* resourceScheduling */) {
     return;
   }
-  bool validateExperiment(const std::string& /* airavataExperimentId */) {
+  bool validateExperiment(const std::string& /* airavataExperimentId */, const std::string& /* airavataCredStoreToken */) {
     bool _return = false;
     return _return;
   }
@@ -2937,20 +2937,27 @@ class Airavata_updateResourceScheduleing_presult {
 class Airavata_validateExperiment_args {
  public:
 
-  Airavata_validateExperiment_args() : airavataExperimentId() {
+  Airavata_validateExperiment_args() : airavataExperimentId(), airavataCredStoreToken() {
   }
 
   virtual ~Airavata_validateExperiment_args() throw() {}
 
   std::string airavataExperimentId;
+  std::string airavataCredStoreToken;
 
   void __set_airavataExperimentId(const std::string& val) {
     airavataExperimentId = val;
   }
 
+  void __set_airavataCredStoreToken(const std::string& val) {
+    airavataCredStoreToken = val;
+  }
+
   bool operator == (const Airavata_validateExperiment_args & rhs) const
   {
     if (!(airavataExperimentId == rhs.airavataExperimentId))
+      return false;
+    if (!(airavataCredStoreToken == rhs.airavataCredStoreToken))
       return false;
     return true;
   }
@@ -2973,6 +2980,7 @@ class Airavata_validateExperiment_pargs {
   virtual ~Airavata_validateExperiment_pargs() throw() {}
 
   const std::string* airavataExperimentId;
+  const std::string* airavataCredStoreToken;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -11131,8 +11139,8 @@ class AiravataClient : virtual public AiravataIf {
   void updateResourceScheduleing(const std::string& airavataExperimentId, const  ::apache::airavata::model::workspace::experiment::ComputationalResourceScheduling& resourceScheduling);
   void send_updateResourceScheduleing(const std::string& airavataExperimentId, const  ::apache::airavata::model::workspace::experiment::ComputationalResourceScheduling& resourceScheduling);
   void recv_updateResourceScheduleing();
-  bool validateExperiment(const std::string& airavataExperimentId);
-  void send_validateExperiment(const std::string& airavataExperimentId);
+  bool validateExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken);
+  void send_validateExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken);
   bool recv_validateExperiment();
   void launchExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken);
   void send_launchExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken);
@@ -11696,13 +11704,13 @@ class AiravataMultiface : virtual public AiravataIf {
     ifaces_[i]->updateResourceScheduleing(airavataExperimentId, resourceScheduling);
   }
 
-  bool validateExperiment(const std::string& airavataExperimentId) {
+  bool validateExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->validateExperiment(airavataExperimentId);
+      ifaces_[i]->validateExperiment(airavataExperimentId, airavataCredStoreToken);
     }
-    return ifaces_[i]->validateExperiment(airavataExperimentId);
+    return ifaces_[i]->validateExperiment(airavataExperimentId, airavataCredStoreToken);
   }
 
   void launchExperiment(const std::string& airavataExperimentId, const std::string& airavataCredStoreToken) {

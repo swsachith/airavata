@@ -93,8 +93,13 @@
 			<version>1.6.12</version>
 			<scope>runtime</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.apache.airavata</groupId>
+            <artifactId>airavata-credential-store</artifactId>
+            <version>0.14-SNAPSHOT</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

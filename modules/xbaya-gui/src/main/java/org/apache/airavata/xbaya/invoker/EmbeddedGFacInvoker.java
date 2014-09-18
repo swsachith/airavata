@@ -42,7 +42,7 @@
 //import org.apache.airavata.credential.store.store.CredentialReaderFactory;
 //import org.apache.airavata.gfac.Constants;
 //import org.apache.airavata.gfac.GFacConfiguration;
-//import org.apache.airavata.gfac.RequestData;
+//import org.apache.airavata.common.utils.RequestData;
 //import org.apache.airavata.gfac.context.ApplicationContext;
 //import org.apache.airavata.gfac.context.JobExecutionContext;
 //import org.apache.airavata.gfac.context.MessageContext;

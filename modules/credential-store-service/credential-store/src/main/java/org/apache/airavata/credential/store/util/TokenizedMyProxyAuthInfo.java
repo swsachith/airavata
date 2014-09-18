@@ -18,19 +18,15 @@
  * under the License.
  *
 */
-package org.apache.airavata.gfac.gsissh.security;
+package org.apache.airavata.credential.store.util;
 
 import org.apache.airavata.common.exception.ApplicationSettingsException;
 import org.apache.airavata.common.utils.ServerSettings;
 import org.apache.airavata.credential.store.credential.Credential;
 import org.apache.airavata.credential.store.credential.impl.certificate.CertificateCredential;
 import org.apache.airavata.credential.store.store.CredentialReader;
-import org.apache.airavata.gfac.Constants;
-import org.apache.airavata.gfac.GFacException;
-import org.apache.airavata.gfac.RequestData;
-import org.apache.airavata.gfac.core.utils.GFacUtils;
-import org.apache.airavata.gsi.ssh.api.authentication.AuthenticationInfo;
-import org.apache.airavata.gsi.ssh.api.authentication.GSIAuthenticationInfo;
+import org.apache.airavata.common.utils.Constants;
+import org.apache.airavata.common.utils.RequestData;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.gsi.provider.GlobusProvider;
@@ -160,7 +156,7 @@ public class TokenizedMyProxyAuthInfo extends GSIAuthenticationInfo {
     public GSSCredential getCredentialsFromStore() throws Exception {
 
         if (getCredentialReader() == null) {
-            setCredentialReader(GFacUtils.getCredentialReader());
+            setCredentialReader(Utility.getCredentialReader());
         }
 
         Credential credential = getCredentialReader().getCredential(getRequestData().getGatewayId(),
@@ -206,20 +202,15 @@ public class TokenizedMyProxyAuthInfo extends GSIAuthenticationInfo {
      * > myproxy-init -A --cert /tmp/x509up_u501 --key /tmp/x509up_u501 -l ogce -s myproxy.teragrid.org
      *
      * @return Renewed credentials.
-     * @throws org.apache.airavata.gfac.GFacException                            If an error occurred while renewing credentials.
      * @throws org.apache.airavata.common.exception.ApplicationSettingsException
      */
-    public GSSCredential renewCredentialsAsATrustedHost() throws GFacException, ApplicationSettingsException {
+    public GSSCredential renewCredentialsAsATrustedHost() throws ApplicationSettingsException, MyProxyException {
         MyProxy myproxy = new MyProxy(getRequestData().getMyProxyServerUrl(), getRequestData().getMyProxyPort());
         GetParams getParams = new GetParams();
         getParams.setAuthzCreds(gssCredentials);
         getParams.setUserName(getRequestData().getMyProxyUserName());
         getParams.setLifetime(getRequestData().getMyProxyLifeTime());
-        try {
-            return myproxy.get(gssCredentials, getParams);
-        } catch (MyProxyException e) {
-            throw new GFacException("An error occurred while renewing security credentials.", e);
-        }
+        return myproxy.get(gssCredentials, getParams);
     }
 
 
@@ -227,17 +218,13 @@ public class TokenizedMyProxyAuthInfo extends GSIAuthenticationInfo {
      * Gets the default proxy certificate.
      *
      * @return Default my proxy credentials.
-     * @throws org.apache.airavata.gfac.GFacException                            If an error occurred while retrieving credentials.
      * @throws org.apache.airavata.common.exception.ApplicationSettingsException
      */
-    public GSSCredential getDefaultCredentials() throws GFacException, ApplicationSettingsException {
+    public GSSCredential getDefaultCredentials() throws ApplicationSettingsException, MyProxyException {
         MyProxy myproxy = new MyProxy(getRequestData().getMyProxyServerUrl(), getRequestData().getMyProxyPort());
-        try {
             return myproxy.get(getRequestData().getMyProxyUserName(), getRequestData().getMyProxyPassword(),
                     getRequestData().getMyProxyLifeTime());
-        } catch (MyProxyException e) {
-            throw new GFacException("An error occurred while retrieving default security credentials.", e);
-        }
+
     }
 
 
@@ -246,10 +233,9 @@ public class TokenizedMyProxyAuthInfo extends GSIAuthenticationInfo {
      * use user name and password to renew credentials.
      *
      * @return Renewed credentials.
-     * @throws org.apache.airavata.gfac.GFacException                            If an error occurred while renewing credentials.
      * @throws org.apache.airavata.common.exception.ApplicationSettingsException
      */
-    public GSSCredential renewCredentials() throws GFacException, ApplicationSettingsException {
+    public GSSCredential renewCredentials() throws ApplicationSettingsException, MyProxyException {
 
         // First try to renew credentials as a trusted renewer
         try {
@@ -266,18 +252,13 @@ public class TokenizedMyProxyAuthInfo extends GSIAuthenticationInfo {
      * Gets a new proxy certificate given current credentials.
      *
      * @return The short lived GSSCredentials
-     * @throws org.apache.airavata.gfac.GFacException                            If an error is occurred while retrieving credentials.
      * @throws org.apache.airavata.common.exception.ApplicationSettingsException
      */
-    public GSSCredential getProxyCredentials() throws GFacException, ApplicationSettingsException {
+    public GSSCredential getProxyCredentials() throws ApplicationSettingsException, MyProxyException {
 
         MyProxy myproxy = new MyProxy(getRequestData().getMyProxyServerUrl(), getRequestData().getMyProxyPort());
-        try {
-            return myproxy.get(gssCredentials, getRequestData().getMyProxyUserName(), getRequestData().getMyProxyPassword(),
-                    getRequestData().getMyProxyLifeTime());
-        } catch (MyProxyException e) {
-            throw new GFacException("An error occurred while renewing security credentials using user/password.", e);
-        }
+        return myproxy.get(gssCredentials, getRequestData().getMyProxyUserName(), getRequestData().getMyProxyPassword(),
+                getRequestData().getMyProxyLifeTime());
     }
 
     public void setGssCredentials(GSSCredential gssCredentials) {
