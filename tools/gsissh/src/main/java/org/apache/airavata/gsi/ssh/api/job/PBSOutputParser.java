@@ -159,10 +159,11 @@ public class PBSOutputParser implements OutputParser {
     public void parse(String userName, Map<String, JobStatus> statusMap, String rawOutput) {
         log.debug(rawOutput);
         String[]    info = rawOutput.split("\n");
-        int lastStop = 0;
+//        int lastStop = 0;
         for (String jobID : statusMap.keySet()) {
             String jobName = jobID.split(",")[1];
-            for (int i = lastStop; i < info.length; i++) {
+            boolean found = false;
+            for (int i = 0; i < info.length; i++) {
                 if (info[i].contains(jobName.substring(0,8))) {
                     // now starts processing this line
                     log.info(info[i]);
@@ -174,11 +175,18 @@ public class PBSOutputParser implements OutputParser {
                             columnList.add(s);
                         }
                     }
-                    lastStop = i + 1;
-                    statusMap.put(jobID, JobStatus.valueOf(columnList.get(9)));
+//                    lastStop = i + 1;
+                    try {
+                        statusMap.put(jobID, JobStatus.valueOf(columnList.get(9)));
+                    }catch(IndexOutOfBoundsException e){
+                        statusMap.put(jobID, JobStatus.valueOf("U"));
+                    }
+                    found = true;
                     break;
                 }
             }
+            if(!found)
+            log.error("Couldn't find the status of the Job with JobName: " + jobName + "Job Id: " + jobID.split(",")[0]);
         }
     }
 

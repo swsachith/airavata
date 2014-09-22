@@ -25,11 +25,13 @@ import org.apache.airavata.common.utils.MonitorPublisher;
 import org.apache.airavata.common.utils.ServerSettings;
 import org.apache.airavata.commons.gfac.type.HostDescription;
 import org.apache.airavata.gfac.GFacException;
+import org.apache.airavata.gfac.core.cpi.BetterGfacImpl;
 import org.apache.airavata.gfac.core.cpi.GFac;
 import org.apache.airavata.gfac.core.monitor.MonitorID;
 import org.apache.airavata.gfac.core.monitor.TaskIdentity;
 import org.apache.airavata.gfac.core.monitor.state.JobStatusChangeRequest;
 import org.apache.airavata.gfac.core.monitor.state.TaskStatusChangeRequest;
+import org.apache.airavata.gfac.core.utils.OutHandlerWorker;
 import org.apache.airavata.gfac.monitor.HostMonitorData;
 import org.apache.airavata.gfac.monitor.UserMonitorData;
 import org.apache.airavata.gfac.monitor.core.PullMonitor;
@@ -48,12 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -64,7 +61,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class HPCPullMonitor extends PullMonitor {
     private final static Logger logger = LoggerFactory.getLogger(HPCPullMonitor.class);
-    public static final int FAILED_COUNT = 5;
+    public static final int FAILED_COUNT = 100000;
 
     // I think this should use DelayedBlocking Queue to do the monitoring*/
     private BlockingQueue<UserMonitorData> queue;
@@ -130,8 +127,7 @@ public class HPCPullMonitor extends PullMonitor {
                 // we catch all the exceptions here because no matter what happens we do not stop running this
                 // thread, but ideally we should report proper error messages, but this is handled in startPulling
                 // method, incase something happen in Thread.sleep we handle it with this catch block.
-                e.printStackTrace();
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(),e);
             }
         }
         // thread is going to return so we close all the connections
@@ -153,7 +149,7 @@ public class HPCPullMonitor extends PullMonitor {
      *
      * @return if the start process is successful return true else false
      */
-    synchronized public boolean startPulling() throws AiravataMonitorException {
+     public boolean startPulling() throws AiravataMonitorException {
         // take the top element in the queue and pull the data and put that element
         // at the tail of the queue
         //todo this polling will not work with multiple usernames but with single user
@@ -208,10 +204,13 @@ public class HPCPullMonitor extends PullMonitor {
                             if (cancelMId.equals(iMonitorID.getUserName() + "," + iMonitorID.getJobName())) {
                                 logger.info("This job is finished because push notification came with <username,jobName> " + cancelMId);
                                 completedJobs.add(iMonitorID);
-                                iterator.remove();
                                 iMonitorID.setStatus(JobState.COMPLETE);
                             }
+                            //we have to make this empty everytime we iterate, otherwise this list will accumilate and will
+                            // lead to a memory leak
+                            iterator.remove();
                         }
+                        iterator = completedJobsFromPush.listIterator();
                     }
                     Map<String, JobState> jobStatuses = connection.getJobStatuses(monitorID);
                     for (MonitorID iMonitorID : monitorID) {
@@ -230,19 +229,12 @@ public class HPCPullMonitor extends PullMonitor {
                             // After successful monitoring perform follow   ing actions to cleanup the queue, if necessary
                             if (jobStatus.getState().equals(JobState.COMPLETE)) {
                                 completedJobs.add(iMonitorID);
-                                try {
-                                    gfac.invokeOutFlowHandlers(iMonitorID.getJobExecutionContext());
-                                } catch (GFacException e) {
-                                    publisher.publish(new TaskStatusChangeRequest(new TaskIdentity(iMonitorID.getExperimentID(), iMonitorID.getWorkflowNodeID(),
-                                            iMonitorID.getTaskID()), TaskState.FAILED));
-                                    //FIXME this is a case where the output retrieving fails even if the job execution was a success. Thus updating the task status
-                                    //should be done understanding whole workflow of job submission and data transfer
-//                            	publisher.publish(new ExperimentStatusChangedEvent(new ExperimentIdentity(iMonitorID.getExperimentID()),
-//										ExperimentState.FAILED));
-                                    logger.info(e.getLocalizedMessage(), e);
-                                }
+                                // we run all the finished jobs in separate threads, because each job doesn't have to wait until
+                                // each one finish transfering files
+                                BetterGfacImpl.getCachedThreadPool().submit(new OutHandlerWorker(gfac, iMonitorID, publisher));
                             } else if (iMonitorID.getFailedCount() > FAILED_COUNT) {
-                                logger.error("Tried to monitor the job with ID " + iMonitorID.getJobID() + " But failed 3 times, so skip this Job from Monitor");
+                                logger.error("Tried to monitor the job with ID " + iMonitorID.getJobID() + " But failed" +iMonitorID.getFailedCount()+
+                                        " 3 times, so skip this Job from Monitor");
                                 iMonitorID.setLastMonitored(new Timestamp((new Date()).getTime()));
                                 completedJobs.add(iMonitorID);
                                 try {
