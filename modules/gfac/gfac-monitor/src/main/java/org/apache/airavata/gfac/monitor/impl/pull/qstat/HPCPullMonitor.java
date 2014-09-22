@@ -38,6 +38,7 @@ import org.apache.airavata.gfac.monitor.impl.push.amqp.SimpleJobFinishConsumer;
 import org.apache.airavata.gfac.monitor.util.CommonUtils;
 import org.apache.airavata.gsi.ssh.api.SSHApiException;
 import org.apache.airavata.credential.store.util.AuthenticationInfo;
+import org.apache.airavata.model.appcatalog.computeresource.ComputeResourceDescription;
 import org.apache.airavata.model.workspace.experiment.JobState;
 import org.apache.airavata.model.workspace.experiment.TaskState;
 import org.apache.airavata.schemas.gfac.GsisshHostType;
@@ -273,15 +274,21 @@ public class HPCPullMonitor extends PullMonitor {
             for (MonitorID completedJob : completedJobs) {
                 CommonUtils.removeMonitorFromQueue(queue, completedJob);
                 if (ServerSettings.getEnableJobRestrictionValidation().equals("true")) { // is job restriction available?
-                    if (zk == null) {
-                        zk = completedJob.getJobExecutionContext().getZk();
+                    ComputeResourceDescription computeResourceDesc = CommonUtils.getComputeResourceDescription(
+                            completedJob.getJobExecutionContext().getTaskData());
+                    if (computeResourceDesc.getBatchQueuesSize() > 0 && computeResourceDesc.getBatchQueues().get(0).getMaxJobsInQueue() > 0) {
+                        if (zk == null) {
+                            zk = completedJob.getJobExecutionContext().getZk();
+                        }
+                        String key = CommonUtils.getJobCountUpdatePath(completedJob);
+                        int i = 0;
+                        if (jobRemoveCountMap.containsKey(key)) {
+                            i = Integer.valueOf(jobRemoveCountMap.get(key));
+                        }
+                        jobRemoveCountMap.put(key, ++i);
+                    } else {
+                        // ignore
                     }
-                    String key = CommonUtils.getJobCountUpdatePath(completedJob);
-                    int i = 0;
-                    if (jobRemoveCountMap.containsKey(key)) {
-                        i = Integer.valueOf(jobRemoveCountMap.get(key));
-                    }
-                    jobRemoveCountMap.put(key, ++i);
                 }
             }
             if (ServerSettings.getEnableJobRestrictionValidation().equals("true") && completedJobs.size() > 0) {

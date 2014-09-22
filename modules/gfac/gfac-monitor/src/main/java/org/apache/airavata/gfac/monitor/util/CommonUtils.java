@@ -20,18 +20,29 @@
 */
 package org.apache.airavata.gfac.monitor.util;
 
+import org.airavata.appcatalog.cpi.AppCatalog;
+import org.airavata.appcatalog.cpi.ComputeResource;
+import org.apache.aiaravata.application.catalog.data.impl.AppCatalogFactory;
+import org.apache.aiaravata.application.catalog.data.resources.AbstractResource;
+import org.apache.airavata.common.exception.AiravataException;
 import org.apache.airavata.common.exception.ApplicationSettingsException;
 import org.apache.airavata.common.utils.AiravataZKUtils;
 import org.apache.airavata.common.utils.Constants;
+import org.apache.airavata.common.utils.ServerSettings;
 import org.apache.airavata.commons.gfac.type.HostDescription;
 import org.apache.airavata.gfac.GFacException;
 import org.apache.airavata.gfac.core.context.JobExecutionContext;
 import org.apache.airavata.gfac.core.handler.GFacHandler;
 import org.apache.airavata.gfac.core.handler.GFacHandlerConfig;
 import org.apache.airavata.gfac.core.monitor.MonitorID;
+import org.apache.airavata.gfac.core.scheduler.HostScheduler;
 import org.apache.airavata.gfac.monitor.HostMonitorData;
 import org.apache.airavata.gfac.monitor.UserMonitorData;
 import org.apache.airavata.gfac.monitor.exception.AiravataMonitorException;
+import org.apache.airavata.model.appcatalog.appdeployment.ApplicationDeploymentDescription;
+import org.apache.airavata.model.appcatalog.appinterface.ApplicationInterfaceDescription;
+import org.apache.airavata.model.appcatalog.computeresource.ComputeResourceDescription;
+import org.apache.airavata.model.workspace.experiment.TaskDetails;
 import org.apache.airavata.schemas.gfac.GsisshHostType;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
@@ -43,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -251,6 +263,7 @@ public class CommonUtils {
             for (String path : changeCountMap.keySet()) {
                 if (isAdd) {
                     CommonUtils.checkAndCreateZNode(zk, path);
+                    logger.info("Recursively created znode : " + path);
                 }
                 byte[] byteData = zk.getData(path, null, null);
                 String nodeData;
@@ -330,4 +343,41 @@ public class CommonUtils {
             zk.create(path, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);// create a znode
         }
     }
+
+    public static ComputeResourceDescription getComputeResourceDescription(TaskDetails taskDetails) throws AiravataException {
+        try {
+            AppCatalog appCatalog = AppCatalogFactory.getAppCatalog();
+            ApplicationInterfaceDescription applicationInterface = appCatalog.getApplicationInterface().
+                    getApplicationInterface(taskDetails.getApplicationId());
+
+            List<String> applicationModules = applicationInterface.getApplicationModules();
+            String selectedModuleId = applicationModules.get(0); // get the first module
+            Map<String, String> moduleIdFilter = new HashMap<String, String>();
+            moduleIdFilter.put(AbstractResource.ApplicationDeploymentConstants.APP_MODULE_ID, selectedModuleId);
+            if (taskDetails.getTaskScheduling()!=null && taskDetails.getTaskScheduling().getResourceHostId() != null) {
+                moduleIdFilter.put(AbstractResource.ApplicationDeploymentConstants.COMPUTE_HOST_ID,
+                        taskDetails.getTaskScheduling().getResourceHostId());
+            }
+            List<ApplicationDeploymentDescription> applicationDeployements = appCatalog.getApplicationDeployment()
+                    .getApplicationDeployements(moduleIdFilter);
+            Map<ComputeResourceDescription, ApplicationDeploymentDescription> deploymentMap =
+                    new HashMap<ComputeResourceDescription, ApplicationDeploymentDescription>();
+            ComputeResource computeResource = appCatalog.getComputeResource();
+            for (ApplicationDeploymentDescription deploymentDescription : applicationDeployements) {
+                deploymentMap.put(computeResource.getComputeResource(deploymentDescription.getComputeHostId()),
+                        deploymentDescription);
+            }
+            List<ComputeResourceDescription> computeHostList = new ArrayList<ComputeResourceDescription>();
+            computeHostList.addAll(deploymentMap.keySet());
+            Class<? extends HostScheduler> aClass = Class.forName(ServerSettings.getHostScheduler()).asSubclass(
+                    HostScheduler.class);
+            HostScheduler hostScheduler = aClass.newInstance();
+            ComputeResourceDescription ComputeResourceDescription = hostScheduler.schedule(computeHostList);
+            ApplicationDeploymentDescription applicationDeploymentDescription = deploymentMap.get(ComputeResourceDescription);
+            return appCatalog.getComputeResource().getComputeResource(applicationDeploymentDescription.getComputeHostId());
+        } catch (Exception e) {
+            throw new AiravataException("Error while getting Compute Resource Description", e);
+        }
+    }
+
 }

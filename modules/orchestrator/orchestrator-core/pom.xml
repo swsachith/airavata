@@ -68,7 +68,7 @@ the License. -->
             <groupId>org.apache.airavata</groupId>
             <artifactId>airavata-gfac-hpc-monitor</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <!--<scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.airavata</groupId>

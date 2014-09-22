@@ -22,6 +22,7 @@ package org.apache.airavata.gfac.monitor.handlers;
 
 import org.apache.airavata.common.exception.ApplicationSettingsException;
 import org.apache.airavata.common.utils.ServerSettings;
+import org.apache.airavata.credential.store.util.AuthenticationInfo;
 import org.apache.airavata.gfac.core.context.JobExecutionContext;
 import org.apache.airavata.gfac.core.cpi.BetterGfacImpl;
 import org.apache.airavata.gfac.core.handler.GFacHandlerException;
@@ -32,8 +33,9 @@ import org.apache.airavata.gfac.monitor.HPCMonitorID;
 import org.apache.airavata.gfac.monitor.exception.AiravataMonitorException;
 import org.apache.airavata.gfac.monitor.impl.pull.qstat.HPCPullMonitor;
 import org.apache.airavata.gfac.monitor.util.CommonUtils;
-import org.apache.airavata.credential.store.util.AuthenticationInfo;
 import org.apache.airavata.gsi.ssh.impl.authentication.MyProxyAuthenticationInfo;
+import org.apache.airavata.model.appcatalog.computeresource.ComputeResourceDescription;
+import org.apache.airavata.model.workspace.experiment.TaskDetails;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -101,7 +103,20 @@ public class GridPullMonitorHandler extends ThreadedHandler implements Watcher{
             }
             CommonUtils.addMonitortoQueue(hpcPullMonitor.getQueue(), monitorID);
             if (ServerSettings.getEnableJobRestrictionValidation().equals("true")) {
-                CommonUtils.increaseZkJobCount(monitorID); // update change job count to zookeeper
+                try {
+                    TaskDetails taskDetails = monitorID.getJobExecutionContext().getTaskData();
+
+                    ComputeResourceDescription computeResourceDescription =
+                            CommonUtils.getComputeResourceDescription(taskDetails);
+                    if (computeResourceDescription.getBatchQueues().size() > 0 &&
+                            computeResourceDescription.getBatchQueues().get(0).getMaxJobsInQueue() > 0) {
+
+                    CommonUtils.increaseZkJobCount(monitorID); // update change job count to zookeeper
+                    }
+                } catch (Exception e) {
+                    logger.error("Error reading max job count from Computer Resource Description," +
+                            " zookeeper job count update process failed");
+                }
             }
         } catch (AiravataMonitorException e) {
             logger.error("Error adding monitorID object to the queue with experiment ", monitorID.getExperimentID());
