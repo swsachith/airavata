@@ -36,7 +36,6 @@ import org.apache.airavata.orchestrator.core.exception.OrchestratorException;
 import org.apache.airavata.orchestrator.core.job.JobSubmitter;
 import org.apache.airavata.orchestrator.core.utils.OrchestratorUtils;
 import org.apache.airavata.orchestrator.core.validator.JobMetadataValidator;
-import org.apache.airavata.orchestrator.core.validator.impl.JobCountValidator;
 import org.apache.airavata.registry.cpi.ChildDataType;
 import org.apache.airavata.registry.cpi.Registry;
 import org.apache.airavata.registry.cpi.RegistryModelType;
@@ -110,7 +109,7 @@ public class SimpleOrchestratorImpl extends AbstractOrchestrator{
         // creating monitorID to register with monitoring queue
         // this is a special case because amqp has to be in place before submitting the job
         try {
-            if (ServerSettings.getEnableJobRestrictionValidation().equals("true") &&
+            if (ServerSettings.getEnableMaxJobCountCheck().equals("true") &&
                     task.getTaskScheduling().getQueueName() != null) {
                 ComputeResourceDescription computeResourceDes = CommonUtils.getComputeResourceDescription(task);
                 String communityUserName = OrchestratorUtils.getCommunityUserName(experiment, computeResourceDes, task,

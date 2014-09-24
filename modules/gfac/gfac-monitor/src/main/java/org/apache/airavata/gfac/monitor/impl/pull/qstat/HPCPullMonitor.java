@@ -266,7 +266,7 @@ public class HPCPullMonitor extends PullMonitor {
             ZooKeeper zk = null;
             for (MonitorID completedJob : completedJobs) {
                 CommonUtils.removeMonitorFromQueue(queue, completedJob);
-                if (ServerSettings.getEnableJobRestrictionValidation().equals("true")) { // is job restriction available?
+                if (ServerSettings.getEnableMaxJobCountCheck().equals("true")) { // is job restriction available?
                     TaskDetails taskDetails = completedJob.getJobExecutionContext().getTaskData();
                     ComputeResourceDescription computeResourceDesc = CommonUtils.getComputeResourceDescription(
                             taskDetails);
@@ -286,7 +286,7 @@ public class HPCPullMonitor extends PullMonitor {
                     }
                 }
             }
-            if (ServerSettings.getEnableJobRestrictionValidation().equals("true") && completedJobs.size() > 0) {
+            if (ServerSettings.getEnableMaxJobCountCheck().equals("true") && completedJobs.size() > 0) {
                 // reduce completed job count from zookeeper
                 CommonUtils.updateZkWithJobCount(zk, jobRemoveCountMap, false);
             }
