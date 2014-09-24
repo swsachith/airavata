@@ -20,14 +20,23 @@
 */
 package org.apache.airavata.orchestrator.cpi.impl;
 
+import org.apache.airavata.common.exception.AiravataException;
+import org.apache.airavata.common.utils.Constants;
+import org.apache.airavata.common.utils.ServerSettings;
+import org.apache.airavata.gfac.monitor.util.CommonUtils;
+import org.apache.airavata.model.appcatalog.computeresource.BatchQueue;
+import org.apache.airavata.model.appcatalog.computeresource.ComputeResourceDescription;
 import org.apache.airavata.model.error.LaunchValidationException;
 import org.apache.airavata.model.error.ValidationResults;
 import org.apache.airavata.model.error.ValidatorResult;
 import org.apache.airavata.model.util.ExperimentModelUtil;
 import org.apache.airavata.model.workspace.experiment.*;
+import org.apache.airavata.orchestrator.core.context.OrchestratorContext;
 import org.apache.airavata.orchestrator.core.exception.OrchestratorException;
 import org.apache.airavata.orchestrator.core.job.JobSubmitter;
+import org.apache.airavata.orchestrator.core.utils.OrchestratorUtils;
 import org.apache.airavata.orchestrator.core.validator.JobMetadataValidator;
+import org.apache.airavata.orchestrator.core.validator.impl.JobCountValidator;
 import org.apache.airavata.registry.cpi.ChildDataType;
 import org.apache.airavata.registry.cpi.Registry;
 import org.apache.airavata.registry.cpi.RegistryModelType;
@@ -35,7 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 public class SimpleOrchestratorImpl extends AbstractOrchestrator{
@@ -91,18 +102,50 @@ public class SimpleOrchestratorImpl extends AbstractOrchestrator{
         }
     }
 
-    public boolean launchExperiment(Experiment experiment, WorkflowNodeDetails workflowNode, TaskDetails task,String tokenId) throws OrchestratorException {
+    public boolean launchExperiment(Experiment experiment, WorkflowNodeDetails workflowNode, TaskDetails task,
+                                    String tokenId) throws OrchestratorException {
         // we give higher priority to userExperimentID
         String experimentId = experiment.getExperimentID();
         String taskId = task.getTaskID();
         // creating monitorID to register with monitoring queue
         // this is a special case because amqp has to be in place before submitting the job
         try {
-            return jobSubmitter.submit(experimentId, taskId,tokenId);
+            if (ServerSettings.getEnableJobRestrictionValidation().equals("true") &&
+                    task.getTaskScheduling().getQueueName() != null) {
+                ComputeResourceDescription computeResourceDes = CommonUtils.getComputeResourceDescription(task);
+                String communityUserName = OrchestratorUtils.getCommunityUserName(experiment, computeResourceDes, task,
+                        tokenId);
+                BatchQueue batchQueue = CommonUtils.getBatchQueueByName(computeResourceDes.getBatchQueues(),
+                        task.getTaskScheduling().getQueueName());
+
+                synchronized (this) {
+                    boolean spaceAvaialble = OrchestratorUtils.isJobSpaceAvailable(communityUserName,
+                            computeResourceDes.getHostName(), batchQueue.getQueueName(), batchQueue.getMaxJobsInQueue());
+                    if (spaceAvaialble) {
+                        if (jobSubmitter.submit(experimentId, taskId, tokenId)) {
+                            logger.info("Job submitted, experiment Id : " + experimentId + " , task Id : " + taskId);
+                            Map<String, Integer> jobUpdateMap = new HashMap<String, Integer>();
+                            StringBuilder sb = new StringBuilder("/").append(Constants.STAT).append("/")
+                                    .append(communityUserName).append("/").append(computeResourceDes.getHostName())
+                                    .append("/").append(Constants.JOB).append("/").append(batchQueue.getQueueName());
+                            jobUpdateMap.put(sb.toString(), 1);
+                            CommonUtils.updateZkWithJobCount(OrchestratorContext.getZk(), jobUpdateMap, true); // update change job count to zookeeper
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        throw new AiravataException("Please honour to the max job submission restriction policy," +
+                                " max count is " + batchQueue.getMaxJobsInQueue());
+                    }
+                }// end of synchronized block
+            } else {
+                logger.info("Ignored job throttling");
+                return jobSubmitter.submit(experimentId, taskId, tokenId);
+            }
         } catch (Exception e) {
             throw new OrchestratorException("Error launching the job", e);
         }
-
     }
 
     /**

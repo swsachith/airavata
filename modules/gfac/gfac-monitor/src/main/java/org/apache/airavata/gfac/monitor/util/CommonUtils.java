@@ -41,6 +41,7 @@ import org.apache.airavata.gfac.monitor.UserMonitorData;
 import org.apache.airavata.gfac.monitor.exception.AiravataMonitorException;
 import org.apache.airavata.model.appcatalog.appdeployment.ApplicationDeploymentDescription;
 import org.apache.airavata.model.appcatalog.appinterface.ApplicationInterfaceDescription;
+import org.apache.airavata.model.appcatalog.computeresource.BatchQueue;
 import org.apache.airavata.model.appcatalog.computeresource.ComputeResourceDescription;
 import org.apache.airavata.model.workspace.experiment.TaskDetails;
 import org.apache.airavata.schemas.gfac.GsisshHostType;
@@ -243,23 +244,6 @@ public class CommonUtils {
     public static void updateZkWithJobCount(ZooKeeper zk, final Map<String, Integer> changeCountMap, boolean isAdd) {
         StringBuilder changeZNodePaths = new StringBuilder();
         try {
-            if (zk == null || !zk.getState().isConnected()) {
-                try {
-                    final CountDownLatch countDownLatch = new CountDownLatch(1);
-                    zk = new ZooKeeper(AiravataZKUtils.getZKhostPort(), 6000, new Watcher() {
-                        @Override
-                        public void process(WatchedEvent event) {
-                            countDownLatch.countDown();
-                        }
-                    });
-                    countDownLatch.await();
-                } catch (ApplicationSettingsException e) {
-                    logger.error("Error while reading zookeeper hostport string");
-                } catch (IOException e) {
-                    logger.error("Error while reconnect attempt to zookeeper where zookeeper connection loss state");
-                }
-            }
-
             for (String path : changeCountMap.keySet()) {
                 if (isAdd) {
                     CommonUtils.checkAndCreateZNode(zk, path);
@@ -325,7 +309,8 @@ public class CommonUtils {
      */
     public static String getJobCountUpdatePath(MonitorID monitorID){
         return new StringBuilder("/").append(Constants.STAT).append("/").append(monitorID.getUserName())
-                .append("/").append(monitorID.getHost().getType().getHostAddress()).append("/").append(Constants.JOB).toString();
+                .append("/").append(monitorID.getHost().getType().getHostAddress()).append("/").append(Constants.JOB).
+                        append("/").append(monitorID.getJobExecutionContext().getTaskData().getTaskScheduling().getQueueName()).toString();
     }
 
     /**
@@ -378,6 +363,15 @@ public class CommonUtils {
         } catch (Exception e) {
             throw new AiravataException("Error while getting Compute Resource Description", e);
         }
+    }
+
+    public static BatchQueue getBatchQueueByName(List<BatchQueue> batchQueues, String queueName) {
+        for (BatchQueue bQueue : batchQueues) {
+            if (bQueue.getQueueName().equals(queueName)) {
+                return bQueue;
+            }
+        }
+        return null;
     }
 
 }

@@ -42,6 +42,7 @@ import org.apache.airavata.gsi.ssh.api.SSHApiException;
 import org.apache.airavata.credential.store.util.AuthenticationInfo;
 import org.apache.airavata.model.appcatalog.computeresource.ComputeResourceDescription;
 import org.apache.airavata.model.workspace.experiment.JobState;
+import org.apache.airavata.model.workspace.experiment.TaskDetails;
 import org.apache.airavata.model.workspace.experiment.TaskState;
 import org.apache.airavata.schemas.gfac.GsisshHostType;
 import org.apache.airavata.schemas.gfac.SSHHostType;
@@ -266,9 +267,11 @@ public class HPCPullMonitor extends PullMonitor {
             for (MonitorID completedJob : completedJobs) {
                 CommonUtils.removeMonitorFromQueue(queue, completedJob);
                 if (ServerSettings.getEnableJobRestrictionValidation().equals("true")) { // is job restriction available?
+                    TaskDetails taskDetails = completedJob.getJobExecutionContext().getTaskData();
                     ComputeResourceDescription computeResourceDesc = CommonUtils.getComputeResourceDescription(
-                            completedJob.getJobExecutionContext().getTaskData());
-                    if (computeResourceDesc.getBatchQueuesSize() > 0 && computeResourceDesc.getBatchQueues().get(0).getMaxJobsInQueue() > 0) {
+                            taskDetails);
+                    if (computeResourceDesc.getBatchQueuesSize() > 0 &&
+                            taskDetails.getTaskScheduling().getQueueName() != null) {
                         if (zk == null) {
                             zk = completedJob.getJobExecutionContext().getZk();
                         }

@@ -102,22 +102,6 @@ public class GridPullMonitorHandler extends ThreadedHandler implements Watcher{
                 e.printStackTrace();
             }
             CommonUtils.addMonitortoQueue(hpcPullMonitor.getQueue(), monitorID);
-            if (ServerSettings.getEnableJobRestrictionValidation().equals("true")) {
-                try {
-                    TaskDetails taskDetails = monitorID.getJobExecutionContext().getTaskData();
-
-                    ComputeResourceDescription computeResourceDescription =
-                            CommonUtils.getComputeResourceDescription(taskDetails);
-                    if (computeResourceDescription.getBatchQueues().size() > 0 &&
-                            computeResourceDescription.getBatchQueues().get(0).getMaxJobsInQueue() > 0) {
-
-                    CommonUtils.increaseZkJobCount(monitorID); // update change job count to zookeeper
-                    }
-                } catch (Exception e) {
-                    logger.error("Error reading max job count from Computer Resource Description," +
-                            " zookeeper job count update process failed");
-                }
-            }
         } catch (AiravataMonitorException e) {
             logger.error("Error adding monitorID object to the queue with experiment ", monitorID.getExperimentID());
         }
