@@ -34,53 +34,50 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class CreateLaunchExperiment {
 
     //FIXME: Read from a config file
-    public static final String THRIFT_SERVER_HOST = "149.165.228.109";
-    public static final int THRIFT_SERVER_PORT = 9930;
+    public static final String THRIFT_SERVER_HOST = "localhost";
+    public static final int THRIFT_SERVER_PORT = 8930;
     private final static Logger logger = LoggerFactory.getLogger(CreateLaunchExperiment.class);
     private static final String DEFAULT_USER = "default.registry.user";
     private static final String DEFAULT_GATEWAY = "default.registry.gateway";
     private static Airavata.Client airavataClient;
-    private static String echoAppId = "Echo_c6e6aaac-7d9d-44fc-aba2-63b5100528e8";
+    private static String echoAppId = "Echo_38c5ad74-3a27-46d3-963b-d63f1c37b194";
     private static String wrfAppId = "WRF_5f097c9c-7066-49ec-aed7-4e39607b3adc";
     private static String amberAppId = "Amber_89906be6-5678-49a6-9d04-a0604fbdef2e";
 
-    private static String localHost = "149.165.228.109";
+    private static String localHost = "localhost";
     private static String trestlesHostName = "trestles.sdsc.xsede.org";
     private static String stampedeHostName = "stampede.tacc.xsede.org";
     private static String br2HostName = "bigred2.uits.iu.edu";
 
     public static void main(String[] args) {
-        try {
+        for (int i = 0; i < 1; i++)
+            try {
             airavataClient = AiravataClientFactory.createAiravataClient(THRIFT_SERVER_HOST, THRIFT_SERVER_PORT);
             System.out.println("API version is " + airavataClient.getAPIVersion());
-//            registerApplications();
-            Date date = new Date();
-            long time = date.getTime();
-            int numberOfRequests = 1;
-            for (int i = 0; i < numberOfRequests; i++) {
-//                (new Thread() {
-//                    @Override
-//                    public void run() {
-                        try {
-                            launchExperiment(airavataClient, createExperimentForBR2(airavataClient));
-                        } catch (Exception e) {
-                            logger.error("Error while connecting with server", e.getMessage());
-                            e.printStackTrace();
-                        }
-                    }
-            long time1 = (date.getTime()-time);
-            System.out.println("Number of requests: " + numberOfRequests + " time taken Miliseconds: " + time1);
+//            registerApplications(); // run this only the first time
 
-//                }).start();
-//            }
+//            final String expId = createExperimentForSSHHost(airavata);
+                final String expId = createEchoExperimentForTrestles(airavataClient);
+//            final String expId = createEchoExperimentForStampede(airavataClient);
+//            final String expId = createExperimentEchoForLocalHost(airavataClient);
+//            final String expId = createExperimentWRFTrestles(airavataClient);
+//            final String expId = createExperimentForBR2(airavataClient);
+//            final String expId = createExperimentForBR2Amber(airavataClient);
+//            final String expId = createExperimentWRFStampede(airavataClient);
+//            final String expId = createExperimentForStampedeAmber(airavataClient);
+//            final String expId = createExperimentForTrestlesAmber(airavataClient);
 
+//            System.out.println("Experiment ID : " + expId);
+//            updateExperiment(airavata, expId);
+            launchExperiment(airavataClient, expId);
+
+//              System.out.println(expId);
         } catch (Exception e) {
             logger.error("Error while connecting with server", e.getMessage());
             e.printStackTrace();

@@ -40,7 +40,9 @@ import org.apache.airavata.gsi.ssh.impl.PBSCluster;
 import org.apache.airavata.gsi.ssh.impl.authentication.DefaultPasswordAuthenticationInfo;
 import org.apache.airavata.gsi.ssh.impl.authentication.DefaultPublicKeyFileAuthentication;
 import org.apache.airavata.gsi.ssh.util.CommonUtils;
+import org.apache.airavata.model.workspace.experiment.CorrectiveAction;
 import org.apache.airavata.model.workspace.experiment.DataTransferDetails;
+import org.apache.airavata.model.workspace.experiment.ErrorCategory;
 import org.apache.airavata.model.workspace.experiment.TransferState;
 import org.apache.airavata.model.workspace.experiment.TransferStatus;
 import org.apache.airavata.registry.cpi.ChildDataType;
@@ -120,6 +122,11 @@ public class AdvancedSCPInputHandler extends AbstractRecoverableHandler {
                     GFACSSHUtils.addSecurityContext(jobExecutionContext);
                 } catch (ApplicationSettingsException e) {
                     log.error(e.getMessage());
+                    try {
+         				GFacUtils.saveErrorDetails(jobExecutionContext, e.getLocalizedMessage(), CorrectiveAction.CONTACT_SUPPORT, ErrorCategory.AIRAVATA_INTERNAL_ERROR);
+         			} catch (GFacException e1) {
+         				 log.error(e1.getLocalizedMessage());
+         			}
                     throw new GFacHandlerException("Error while creating SSHSecurityContext", e, e.getLocalizedMessage());
                 }
             }
@@ -221,6 +228,11 @@ public class AdvancedSCPInputHandler extends AbstractRecoverableHandler {
 			}
         } catch (Exception e) {
             log.error(e.getMessage());
+            try {
+ 				GFacUtils.saveErrorDetails(jobExecutionContext, e.getLocalizedMessage(), CorrectiveAction.CONTACT_SUPPORT, ErrorCategory.AIRAVATA_INTERNAL_ERROR);
+ 			} catch (GFacException e1) {
+ 				 log.error(e1.getLocalizedMessage());
+ 			}
             throw new GFacHandlerException("Error while input File Staging", e, e.getLocalizedMessage());
         }
         jobExecutionContext.setInMessageContext(inputNew);
