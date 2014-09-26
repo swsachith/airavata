@@ -142,11 +142,9 @@ public class OrchestratorUtils {
 
     public static boolean isJobSpaceAvailable(String communityUserName, String computeHostName, String queueName, int resourceMaxJobCount)
             throws ApplicationSettingsException {
-        if (communityUserName == null) {
-            throw new IllegalArgumentException("Community user name should not be null");
-        }
-        if (computeHostName == null) {
-            throw new IllegalArgumentException("Compute resource should not be null");
+        if (communityUserName == null || computeHostName == null) {
+            throw new IllegalArgumentException("Either Community user name  or copute host name should not be null , " +
+                    "communityUserName = " + communityUserName + " , computeHostName = " + computeHostName);
         }
         String keyPath = new StringBuilder("/" + Constants.STAT).append("/").append(communityUserName)
                 .append("/").toString();

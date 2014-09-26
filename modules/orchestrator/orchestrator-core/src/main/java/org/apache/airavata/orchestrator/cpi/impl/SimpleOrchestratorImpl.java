@@ -118,9 +118,9 @@ public class SimpleOrchestratorImpl extends AbstractOrchestrator{
                         task.getTaskScheduling().getQueueName());
 
                 synchronized (this) {
-                    boolean spaceAvaialble = OrchestratorUtils.isJobSpaceAvailable(communityUserName,
+                    boolean spaceAvailable = OrchestratorUtils.isJobSpaceAvailable(communityUserName,
                             computeResourceDes.getHostName(), batchQueue.getQueueName(), batchQueue.getMaxJobsInQueue());
-                    if (spaceAvaialble) {
+                    if (spaceAvailable) {
                         if (jobSubmitter.submit(experimentId, taskId, tokenId)) {
                             logger.info("Job submitted, experiment Id : " + experimentId + " , task Id : " + taskId);
                             Map<String, Integer> jobUpdateMap = new HashMap<String, Integer>();
