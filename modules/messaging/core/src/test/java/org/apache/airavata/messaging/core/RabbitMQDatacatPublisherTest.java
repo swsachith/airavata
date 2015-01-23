@@ -35,9 +35,12 @@ public class RabbitMQDatacatPublisherTest {
         String messageId = "tesaeqwe";
         String gatewayID = "gridChem";
         String expID = "230u34jnr0813";
+        String username = "230u34jnr0813";
+        String appName = "gaussian";
+
 
         ExperimentOutputCreatedEvent event = new ExperimentOutputCreatedEvent(expID,
-                outputFile, outputPath+ File.separatorChar+outputFile);
+                outputFile, outputPath+ File.separatorChar+outputFile,username,appName,gatewayID);
 
         MessageContext messageContext = new MessageContext(event, MessageType.EXPERIMENT_OUTPUT
                 , messageId, gatewayID);

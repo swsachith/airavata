@@ -30,6 +30,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.airavata.common.exception.AiravataException;
+import org.apache.airavata.common.exception.ApplicationSettingsException;
+import org.apache.airavata.common.utils.AiravataUtils;
+import org.apache.airavata.common.utils.ServerSettings;
 import org.apache.airavata.gfac.Constants;
 import org.apache.airavata.gfac.GFacException;
 import org.apache.airavata.gfac.core.context.JobExecutionContext;
@@ -41,18 +45,19 @@ import org.apache.airavata.gfac.core.utils.GFacUtils;
 import org.apache.airavata.gfac.core.utils.OutputUtils;
 import org.apache.airavata.gfac.local.utils.InputStreamToFileWriter;
 import org.apache.airavata.gfac.local.utils.InputUtils;
+import org.apache.airavata.messaging.core.MessageContext;
+import org.apache.airavata.messaging.core.impl.RabbitMQDatacatPublisher;
 import org.apache.airavata.model.appcatalog.appdeployment.ApplicationDeploymentDescription;
 import org.apache.airavata.model.appcatalog.appdeployment.SetEnvPaths;
 import org.apache.airavata.model.appcatalog.appinterface.InputDataObjectType;
 import org.apache.airavata.model.appcatalog.appinterface.OutputDataObjectType;
-import org.apache.airavata.model.messaging.event.JobIdentifier;
-import org.apache.airavata.model.messaging.event.JobStatusChangeEvent;
-import org.apache.airavata.model.messaging.event.TaskIdentifier;
-import org.apache.airavata.model.messaging.event.TaskOutputChangeEvent;
+import org.apache.airavata.model.messaging.event.*;
+import org.apache.airavata.model.workspace.experiment.Experiment;
 import org.apache.airavata.model.workspace.experiment.JobDetails;
 import org.apache.airavata.model.workspace.experiment.JobState;
 import org.apache.airavata.model.workspace.experiment.TaskDetails;
 import org.apache.airavata.registry.cpi.ChildDataType;
+import org.apache.airavata.registry.cpi.RegistryException;
 import org.apache.airavata.registry.cpi.RegistryModelType;
 import org.apache.xmlbeans.XmlException;
 import org.slf4j.Logger;
@@ -65,6 +70,7 @@ public class LocalProvider extends AbstractProvider {
     private ProcessBuilder builder;
     private List<String> cmdList;
     private String jobId;
+    private RabbitMQDatacatPublisher rabbitMQDatacatPublisher;
     
     public static class LocalProviderJobData{
     	private String applicationName;
@@ -105,6 +111,11 @@ public class LocalProvider extends AbstractProvider {
     }
     public LocalProvider(){
         cmdList = new ArrayList<String>();
+        try {
+            rabbitMQDatacatPublisher = new RabbitMQDatacatPublisher();
+        } catch (Exception e) {
+            log.error(e.toString());
+        }
     }
 
     public void initialize(JobExecutionContext jobExecutionContext) throws GFacProviderException,GFacException {
@@ -183,12 +194,57 @@ public class LocalProvider extends AbstractProvider {
                     jobExecutionContext.getExperimentID(),
                     jobExecutionContext.getGatewayID());
             this.getMonitorPublisher().publish(new JobStatusChangeEvent(JobState.COMPLETE, jobIdentity));
+
+            System.out.println("Im HERE ... BEFORE SENDING MESSAGE!!!!!!!!");
+            //Sending the message to the Datacat server
+           // if (true) {
+                Experiment experiment = (Experiment) registry.get(RegistryModelType.EXPERIMENT, jobExecutionContext.getExperimentID());
+                String user_name = experiment.getUserName();
+                String gatewayName = jobExecutionContext.getGatewayID();
+                String gatewayId = ServerSettings.getDefaultUserGateway();
+                String applicationName = jobExecutionContext.getApplicationName();
+            String outputPath = jobExecutionContext.getOutputDir();
+
+            ExperimentOutputCreatedEvent event = new ExperimentOutputCreatedEvent(
+                    jobExecutionContext.getExperimentID(),
+                    "23123", outputPath + File.separatorChar + "wae123", user_name,gatewayName,applicationName);
+
+            String messageId = AiravataUtils.getId("EXPERIMENT");
+            MessageContext messageContext = new MessageContext(event, MessageType.EXPERIMENT_OUTPUT
+                    , messageId, gatewayId);
+            messageContext.setUpdatedTime(AiravataUtils.getCurrentTimestamp());
+            System.out.println("--------------- trying to send the message to RABBIT DATACAT");
+            rabbitMQDatacatPublisher.publish(messageContext);
+
+            System.out.println("-0-----------------------------------------BEFORE ITERATING OUTPUTFILES");
+            for (String outputFileName : jobExecutionContext.getOutputFiles()) {
+                    String outputPath_2 = jobExecutionContext.getOutputDir();
+
+                    ExperimentOutputCreatedEvent event_2 = new ExperimentOutputCreatedEvent(
+                            jobExecutionContext.getExperimentID(),
+                            outputFileName, outputPath + File.separatorChar + outputFileName, user_name,gatewayName,applicationName);
+
+                    String messageId_2 = AiravataUtils.getId("EXPERIMENT");
+                    MessageContext messageContext_2 = new MessageContext(event, MessageType.EXPERIMENT_OUTPUT
+                           , messageId, gatewayId);
+                    messageContext.setUpdatedTime(AiravataUtils.getCurrentTimestamp());
+                    System.out.println("--------------- AFTER OUTPUT FILE ITERATION");
+                    rabbitMQDatacatPublisher.publish(messageContext);
+
+           //     }
+            }
         } catch (IOException io) {
             throw new GFacProviderException(io.getMessage(), io);
         } catch (InterruptedException e) {
             throw new GFacProviderException(e.getMessage(), e);
         }catch (GFacException e) {
             throw new GFacProviderException(e.getMessage(), e);
+        } catch (ApplicationSettingsException e) {
+            e.printStackTrace();
+        } catch (RegistryException e) {
+            e.printStackTrace();
+        } catch (AiravataException e) {
+            e.printStackTrace();
         }
     }
 
