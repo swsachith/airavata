@@ -43,7 +43,9 @@ import org.apache.airavata.model.workspace.experiment.ErrorCategory;
 import org.apache.airavata.model.workspace.experiment.TaskDetails;
 import org.apache.airavata.model.workspace.experiment.TransferState;
 import org.apache.airavata.model.workspace.experiment.TransferStatus;
+import org.apache.airavata.persistance.registry.jpa.model.Experiment;
 import org.apache.airavata.registry.cpi.ChildDataType;
+import org.apache.airavata.registry.cpi.RegistryModelType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,17 +231,24 @@ public class SSHOutputHandler extends AbstractHandler {
 
             //Sending the message to the Datacat server
             if (ServerSettings.isRabbitMqPublishEnabled()) {
+                Experiment experiment = (Experiment) registry.get(RegistryModelType.EXPERIMENT, jobExecutionContext.getExperimentID());
+                String user_name = experiment.getUser().getUser_name();
+                String gatewayName = experiment.getGatewayName();
                 String gatewayId = ServerSettings.getDefaultUserGateway();
+                String applicationName = jobExecutionContext.getApplicationName();
                 for (String outputFileName : jobExecutionContext.getOutputFiles()) {
                     String outputPath = jobExecutionContext.getOutputDir();
+
                     ExperimentOutputCreatedEvent event = new ExperimentOutputCreatedEvent(
                             jobExecutionContext.getExperimentID(),
-                            outputFileName, outputPath + File.separatorChar + outputFileName);
+                            outputFileName, outputPath + File.separatorChar + outputFileName, user_name,gatewayName,applicationName);
+
                     String messageId = AiravataUtils.getId("EXPERIMENT");
                     MessageContext messageContext = new MessageContext(event, MessageType.EXPERIMENT_OUTPUT
                             , messageId, gatewayId);
                     messageContext.setUpdatedTime(AiravataUtils.getCurrentTimestamp());
                     datacatPublisher.publish(messageContext);
+
                 }
             }
 
