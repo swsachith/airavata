@@ -124,6 +124,9 @@ struct ExperimentOutputCreatedEvent {
     1: required string experimentId;
     2: required string filename;
     3: required string filepath;
+    4: required string username;
+    5: required string gatewayName;
+    6: required string applicationName;
 
 }
 

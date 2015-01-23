@@ -38,6 +38,9 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
   private static final org.apache.thrift.protocol.TField EXPERIMENT_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("experimentId", org.apache.thrift.protocol.TType.STRING, (short)1);
   private static final org.apache.thrift.protocol.TField FILENAME_FIELD_DESC = new org.apache.thrift.protocol.TField("filename", org.apache.thrift.protocol.TType.STRING, (short)2);
   private static final org.apache.thrift.protocol.TField FILEPATH_FIELD_DESC = new org.apache.thrift.protocol.TField("filepath", org.apache.thrift.protocol.TType.STRING, (short)3);
+  private static final org.apache.thrift.protocol.TField USERNAME_FIELD_DESC = new org.apache.thrift.protocol.TField("username", org.apache.thrift.protocol.TType.STRING, (short)4);
+  private static final org.apache.thrift.protocol.TField GATEWAY_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("gatewayName", org.apache.thrift.protocol.TType.STRING, (short)5);
+  private static final org.apache.thrift.protocol.TField APPLICATION_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("applicationName", org.apache.thrift.protocol.TType.STRING, (short)6);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -48,12 +51,18 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
   public String experimentId; // required
   public String filename; // required
   public String filepath; // required
+  public String username; // required
+  public String gatewayName; // required
+  public String applicationName; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     EXPERIMENT_ID((short)1, "experimentId"),
     FILENAME((short)2, "filename"),
-    FILEPATH((short)3, "filepath");
+    FILEPATH((short)3, "filepath"),
+    USERNAME((short)4, "username"),
+    GATEWAY_NAME((short)5, "gatewayName"),
+    APPLICATION_NAME((short)6, "applicationName");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -74,6 +83,12 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
           return FILENAME;
         case 3: // FILEPATH
           return FILEPATH;
+        case 4: // USERNAME
+          return USERNAME;
+        case 5: // GATEWAY_NAME
+          return GATEWAY_NAME;
+        case 6: // APPLICATION_NAME
+          return APPLICATION_NAME;
         default:
           return null;
       }
@@ -123,6 +138,12 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.FILEPATH, new org.apache.thrift.meta_data.FieldMetaData("filepath", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.USERNAME, new org.apache.thrift.meta_data.FieldMetaData("username", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.GATEWAY_NAME, new org.apache.thrift.meta_data.FieldMetaData("gatewayName", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.APPLICATION_NAME, new org.apache.thrift.meta_data.FieldMetaData("applicationName", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(ExperimentOutputCreatedEvent.class, metaDataMap);
   }
@@ -133,12 +154,18 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
   public ExperimentOutputCreatedEvent(
     String experimentId,
     String filename,
-    String filepath)
+    String filepath,
+    String username,
+    String gatewayName,
+    String applicationName)
   {
     this();
     this.experimentId = experimentId;
     this.filename = filename;
     this.filepath = filepath;
+    this.username = username;
+    this.gatewayName = gatewayName;
+    this.applicationName = applicationName;
   }
 
   /**
@@ -154,6 +181,15 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
     if (other.isSetFilepath()) {
       this.filepath = other.filepath;
     }
+    if (other.isSetUsername()) {
+      this.username = other.username;
+    }
+    if (other.isSetGatewayName()) {
+      this.gatewayName = other.gatewayName;
+    }
+    if (other.isSetApplicationName()) {
+      this.applicationName = other.applicationName;
+    }
   }
 
   public ExperimentOutputCreatedEvent deepCopy() {
@@ -165,6 +201,9 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
     this.experimentId = null;
     this.filename = null;
     this.filepath = null;
+    this.username = null;
+    this.gatewayName = null;
+    this.applicationName = null;
   }
 
   public String getExperimentId() {
@@ -239,6 +278,78 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
     }
   }
 
+  public String getUsername() {
+    return this.username;
+  }
+
+  public ExperimentOutputCreatedEvent setUsername(String username) {
+    this.username = username;
+    return this;
+  }
+
+  public void unsetUsername() {
+    this.username = null;
+  }
+
+  /** Returns true if field username is set (has been assigned a value) and false otherwise */
+  public boolean isSetUsername() {
+    return this.username != null;
+  }
+
+  public void setUsernameIsSet(boolean value) {
+    if (!value) {
+      this.username = null;
+    }
+  }
+
+  public String getGatewayName() {
+    return this.gatewayName;
+  }
+
+  public ExperimentOutputCreatedEvent setGatewayName(String gatewayName) {
+    this.gatewayName = gatewayName;
+    return this;
+  }
+
+  public void unsetGatewayName() {
+    this.gatewayName = null;
+  }
+
+  /** Returns true if field gatewayName is set (has been assigned a value) and false otherwise */
+  public boolean isSetGatewayName() {
+    return this.gatewayName != null;
+  }
+
+  public void setGatewayNameIsSet(boolean value) {
+    if (!value) {
+      this.gatewayName = null;
+    }
+  }
+
+  public String getApplicationName() {
+    return this.applicationName;
+  }
+
+  public ExperimentOutputCreatedEvent setApplicationName(String applicationName) {
+    this.applicationName = applicationName;
+    return this;
+  }
+
+  public void unsetApplicationName() {
+    this.applicationName = null;
+  }
+
+  /** Returns true if field applicationName is set (has been assigned a value) and false otherwise */
+  public boolean isSetApplicationName() {
+    return this.applicationName != null;
+  }
+
+  public void setApplicationNameIsSet(boolean value) {
+    if (!value) {
+      this.applicationName = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case EXPERIMENT_ID:
@@ -265,6 +376,30 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
       }
       break;
 
+    case USERNAME:
+      if (value == null) {
+        unsetUsername();
+      } else {
+        setUsername((String)value);
+      }
+      break;
+
+    case GATEWAY_NAME:
+      if (value == null) {
+        unsetGatewayName();
+      } else {
+        setGatewayName((String)value);
+      }
+      break;
+
+    case APPLICATION_NAME:
+      if (value == null) {
+        unsetApplicationName();
+      } else {
+        setApplicationName((String)value);
+      }
+      break;
+
     }
   }
 
@@ -278,6 +413,15 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
 
     case FILEPATH:
       return getFilepath();
+
+    case USERNAME:
+      return getUsername();
+
+    case GATEWAY_NAME:
+      return getGatewayName();
+
+    case APPLICATION_NAME:
+      return getApplicationName();
 
     }
     throw new IllegalStateException();
@@ -296,6 +440,12 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
       return isSetFilename();
     case FILEPATH:
       return isSetFilepath();
+    case USERNAME:
+      return isSetUsername();
+    case GATEWAY_NAME:
+      return isSetGatewayName();
+    case APPLICATION_NAME:
+      return isSetApplicationName();
     }
     throw new IllegalStateException();
   }
@@ -337,6 +487,33 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
       if (!(this_present_filepath && that_present_filepath))
         return false;
       if (!this.filepath.equals(that.filepath))
+        return false;
+    }
+
+    boolean this_present_username = true && this.isSetUsername();
+    boolean that_present_username = true && that.isSetUsername();
+    if (this_present_username || that_present_username) {
+      if (!(this_present_username && that_present_username))
+        return false;
+      if (!this.username.equals(that.username))
+        return false;
+    }
+
+    boolean this_present_gatewayName = true && this.isSetGatewayName();
+    boolean that_present_gatewayName = true && that.isSetGatewayName();
+    if (this_present_gatewayName || that_present_gatewayName) {
+      if (!(this_present_gatewayName && that_present_gatewayName))
+        return false;
+      if (!this.gatewayName.equals(that.gatewayName))
+        return false;
+    }
+
+    boolean this_present_applicationName = true && this.isSetApplicationName();
+    boolean that_present_applicationName = true && that.isSetApplicationName();
+    if (this_present_applicationName || that_present_applicationName) {
+      if (!(this_present_applicationName && that_present_applicationName))
+        return false;
+      if (!this.applicationName.equals(that.applicationName))
         return false;
     }
 
@@ -386,6 +563,36 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetUsername()).compareTo(other.isSetUsername());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetUsername()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.username, other.username);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetGatewayName()).compareTo(other.isSetGatewayName());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetGatewayName()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.gatewayName, other.gatewayName);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetApplicationName()).compareTo(other.isSetApplicationName());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetApplicationName()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.applicationName, other.applicationName);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -429,6 +636,30 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
       sb.append(this.filepath);
     }
     first = false;
+    if (!first) sb.append(", ");
+    sb.append("username:");
+    if (this.username == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.username);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("gatewayName:");
+    if (this.gatewayName == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.gatewayName);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("applicationName:");
+    if (this.applicationName == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.applicationName);
+    }
+    first = false;
     sb.append(")");
     return sb.toString();
   }
@@ -443,6 +674,15 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
     }
     if (filepath == null) {
       throw new org.apache.thrift.protocol.TProtocolException("Required field 'filepath' was not present! Struct: " + toString());
+    }
+    if (username == null) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'username' was not present! Struct: " + toString());
+    }
+    if (gatewayName == null) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'gatewayName' was not present! Struct: " + toString());
+    }
+    if (applicationName == null) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'applicationName' was not present! Struct: " + toString());
     }
     // check for sub-struct validity
   }
@@ -505,6 +745,30 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 4: // USERNAME
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.username = iprot.readString();
+              struct.setUsernameIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 5: // GATEWAY_NAME
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.gatewayName = iprot.readString();
+              struct.setGatewayNameIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 6: // APPLICATION_NAME
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.applicationName = iprot.readString();
+              struct.setApplicationNameIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -535,6 +799,21 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
         oprot.writeString(struct.filepath);
         oprot.writeFieldEnd();
       }
+      if (struct.username != null) {
+        oprot.writeFieldBegin(USERNAME_FIELD_DESC);
+        oprot.writeString(struct.username);
+        oprot.writeFieldEnd();
+      }
+      if (struct.gatewayName != null) {
+        oprot.writeFieldBegin(GATEWAY_NAME_FIELD_DESC);
+        oprot.writeString(struct.gatewayName);
+        oprot.writeFieldEnd();
+      }
+      if (struct.applicationName != null) {
+        oprot.writeFieldBegin(APPLICATION_NAME_FIELD_DESC);
+        oprot.writeString(struct.applicationName);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -555,6 +834,9 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
       oprot.writeString(struct.experimentId);
       oprot.writeString(struct.filename);
       oprot.writeString(struct.filepath);
+      oprot.writeString(struct.username);
+      oprot.writeString(struct.gatewayName);
+      oprot.writeString(struct.applicationName);
     }
 
     @Override
@@ -566,6 +848,12 @@ public class ExperimentOutputCreatedEvent implements org.apache.thrift.TBase<Exp
       struct.setFilenameIsSet(true);
       struct.filepath = iprot.readString();
       struct.setFilepathIsSet(true);
+      struct.username = iprot.readString();
+      struct.setUsernameIsSet(true);
+      struct.gatewayName = iprot.readString();
+      struct.setGatewayNameIsSet(true);
+      struct.applicationName = iprot.readString();
+      struct.setApplicationNameIsSet(true);
     }
   }
 
